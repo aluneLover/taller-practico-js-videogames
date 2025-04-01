@@ -32,6 +32,7 @@ let enemiesPosition = []
 window.addEventListener('load', setCanvasSize);
 window.addEventListener('resize', setCanvasSize);
 
+window.addEventListener('keydown', reloadGame)
 window.addEventListener('keydown', moveByKeys);
 btnUp.addEventListener('click', moveUp);
 btnDown.addEventListener('click', moveDown);
@@ -54,14 +55,19 @@ function setCanvasSize() {
     startGame()
 }
 function startGame() {
-    
+    pResult.innerHTML = ''
     game.font = elementsSize + 'px Verdana';
     game.textAlign = 'end';
     
     const map = maps[level]
     if(!map) {
         gameWin()
-        return;
+        game.textAlign = 'center'
+        game.font = '24px Verdana'
+        game.clearRect(0,0,canvasSize,canvasSize)
+        game.fillText('Press \'space\' for restart game', canvasSize/2,canvasSize/2)
+    
+        return
     }
 
     if(!timeStart) {
@@ -147,8 +153,15 @@ function movePlayer() {
     })
     
     if(enemyCollision) {
-        levelFail()
+        transitionLevelFail()
     }
+}
+function transitionLevelFail() {
+    game.clearRect(playerPosition.x - elementsSize,playerPosition.y - elementsSize,elementsSize,elementsSize + 7)
+    game.fillText(emojis['DEATH'],playerPosition.x, playerPosition.y)
+    levelFail()
+    
+
 }
 function levelWin() {
     level++
@@ -197,14 +210,22 @@ function levelFail() {
         level = 0
         lives = 3
         timeStart = undefined
+        gameOver()
     }
     
     playerPosition.x = undefined
     playerPosition.y = undefined
-    startGame()
+    setTimeout(startGame, 500)
+}
+function gameOver() {
+    game.textAlign = 'center'
+    game.clearRect(0,0,canvasSize,canvasSize)
+    game.fillText('Game Over',canvasSize / 2, canvasSize / 2)
+    game.font = '25px Verdana'
 }
 
 function moveByKeys (event) {
+    
     if(event.key == 'ArrowUp') {
         moveUp();
     } else if(event.key == 'ArrowDown') {
@@ -220,26 +241,34 @@ function moveUp () {
         playerPosition.y -= elementsSize
         startGame()
     }
-    startGame()
 }
 function moveDown () {
     if(playerPosition.y < canvasSize) {
         playerPosition.y += elementsSize
         startGame()
     }
-    startGame()
 }
 function moveLeft () {
     if(playerPosition.x > elementsSize) {
         playerPosition.x -= elementsSize
         startGame()
     }
-    startGame()
 }
 function moveRight () {
     if(playerPosition.x < canvasSize) {
         playerPosition.x += elementsSize
         startGame()
     }
-    startGame()
+}
+function reloadGame(event) {
+    if(event.key == ' ') {
+        console.log('reiniciate');
+        level = 0
+        lives = 3
+        timeStart = undefined
+        playerPosition.x = undefined
+        playerPosition.y = undefined
+        startGame()
+    }
+
 }
